@@ -7,7 +7,7 @@ A secure and scalable web-based system to manage repositories and version-contro
 
 Clone the repo:
 
-git clone https://github.com/your-username/alobha-file-management.git
+git clone https://github.com/sagarproit/alobha-file-management.git
 cd alobha-file-management
 
 Install dependencies:
