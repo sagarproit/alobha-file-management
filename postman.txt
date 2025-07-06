@@ -1,0 +1,25 @@
+Register
+POST /api/register
+{
+    "name": "John Doe",
+    "email": "john@example.com",
+    "password": "secret123"
+}
+
+
+Login
+POST /api/login
+{
+    "email": "john@example.com",
+    "password": "secret123"
+}
+
+
+Profile
+GET /api/profile
+Authorization: Bearer <token>
+
+
+Logout
+POST /api/logout
+Authorization: Bearer <token>

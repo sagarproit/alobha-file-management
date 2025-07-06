@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Assign Role</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">📁 Alobha File Management</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/profile.html">👤 Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/repositories.html">📂 Repositories</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/upload.html">⬆️ Upload</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/listing.html">📋 Listing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/assign-role.html">👥 Assign Role</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <button class="btn btn-sm btn-outline-light" onclick="logout()">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-header bg-dark text-white">
+      <h4>Assign Role to User</h4>
+    </div>
+    <div class="card-body">
+      <form id="assignRoleForm">
+        <div class="mb-3">
+          <label for="repositoryId" class="form-label">Select Repository</label>
+          <select id="repositoryId" class="form-select" required></select>
+        </div>
+
+        <div class="mb-3">
+          <label for="userId" class="form-label">Select User</label>
+          <select id="userId" class="form-select" required></select>
+        </div>
+
+        <div class="mb-3">
+          <label for="role" class="form-label">Role</label>
+          <select id="role" class="form-select" required>
+            <option value="read">Read</option>
+            <option value="write">Write</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Assign Role</button>
+      </form>
+
+      <div id="roleStatus" class="mt-3 alert d-none"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const token = localStorage.getItem('token');
+const userSelect = document.getElementById('userId');
+const repoSelect = document.getElementById('repositoryId');
+
+async function loadUsers() {
+  const res = await fetch('/api/users', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  const users = await res.json();
+  users.forEach(user => {
+    const option = document.createElement('option');
+    option.value = user.id;
+    option.textContent = user.name;
+    userSelect.appendChild(option);
+  });
+}
+
+async function loadRepositories() {
+  const res = await fetch('/api/repositories', {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  const repos = await res.json();
+  repos.forEach(repo => {
+    const option = document.createElement('option');
+    option.value = repo.id;
+    option.textContent = repo.name;
+    repoSelect.appendChild(option);
+  });
+}
+
+document.getElementById('assignRoleForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const res = await fetch(`/api/repositories/${repoSelect.value}/assign-role`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      user_id: userSelect.value,
+      role: document.getElementById('role').value
+    })
+  });
+
+  const data = await res.json();
+  const status = document.getElementById('roleStatus');
+  status.classList.remove('d-none', 'alert-success', 'alert-danger');
+
+  if (res.ok) {
+    status.classList.add('alert-success');
+    status.textContent = data.message;
+  } else {
+    status.classList.add('alert-danger');
+    status.textContent = data.error || 'Something went wrong';
+  }
+});
+
+loadUsers();
+loadRepositories();
+</script>
+<script src="js/auth.js"></script>
+</body>
+</html>

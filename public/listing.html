@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Repository Files</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/diff2html/bundles/css/diff2html.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">📁 Alobha File Management</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/profile.html">👤 Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/repositories.html">📂 Repositories</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/upload.html">⬆️ Upload</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/listing.html">📋 Listing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/assign-role.html">👥 Assign Role</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <button class="btn btn-sm btn-outline-light" onclick="logout()">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <h3 class="mb-4">📂 Repository Files</h3>
+   <div class="input-group my-3">
+    <input type="text" id="searchInput" class="form-control" placeholder="Search files by name or content">
+    <button class="btn btn-primary" onclick="searchFiles()">Search</button>
+  </div>
+  <!-- Select repository -->
+  <div class="mb-3">
+    <label for="repoSelect" class="form-label">Select Repository</label>
+    <select id="repoSelect" class="form-select"><option value="">Please Select</option></select>
+  </div>
+
+  <!-- File List Table -->
+  <div id="fileTableWrapper" class="d-none">
+    <table class="table table-bordered table-striped align-middle">
+      <thead>
+        <tr>
+          <th>📄 File Name</th>
+          <th>Version</th>
+          <th>Uploaded At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="fileTableBody"></tbody>
+    </table>
+  </div>
+
+  <div id="fileResults" class="row"></div>
+
+
+  <!-- Version History Section -->
+  <div id="versionHistoryWrapper" class="mt-5 d-none">
+    <h5>📜 Version History for <span id="historyFileName"></span></h5>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Version</th>
+          <th>Uploaded By</th>
+          <th>Date</th>
+          <th>Download</th>
+        </tr>
+      </thead>
+      <tbody id="versionHistoryBody"></tbody>
+    </table>
+    <button class="btn btn-warning" onclick="showCompareModal()">Compare Versions</button>
+  </div>
+
+  <!-- Compare Modal -->
+  <div id="compareModal" class="p-3 mt-3 border rounded bg-white d-none">
+    <h5>Compare Versions</h5>
+    <input type="hidden" id="compareFileId">
+    <div class="row g-2">
+      <div class="col-md-5">
+        <label>Version A</label>
+        <select id="versionA" class="form-select"></select>
+      </div>
+      <div class="col-md-5">
+        <label>Version B</label>
+        <select id="versionB" class="form-select"></select>
+      </div>
+      <div class="col-md-2 d-flex align-items-end">
+        <button class="btn btn-primary w-100" onclick="compareVersions()">Compare</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diff Viewer -->
+  <div id="diffContainer" class="mt-4"></div>
+</div>
+<!-- Preview Modal -->
+<div id="previewModal" class="modal fade" tabindex="-1">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="previewTitle">File Preview</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <pre id="previewContent" class="bg-light p-3 rounded" style="white-space: pre-wrap;"></pre>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bootstrap JS (if not included yet) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/diff@5.1.0/dist/diff.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/diff2html/bundles/js/diff2html.min.js"></script>
+<script>
+  const token = localStorage.getItem('token');
+  const API = '/api';
+  let currentVersions = [];
+  let currentFileId = null;
+
+  async function loadRepositories() {
+    const res = await fetch(`${API}/repositories`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const repos = await res.json();
+    const select = document.getElementById('repoSelect');
+    repos.forEach(repo => {
+      const opt = document.createElement('option');
+      opt.value = repo.id;
+      opt.textContent = repo.name;
+      select.appendChild(opt);
+    });
+  }
+
+  async function loadFiles(repoId) {
+    const res = await fetch(`${API}/repositories/${repoId}/files`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const files = await res.json();
+    const table = document.getElementById('fileTableBody');
+    table.innerHTML = '';
+    files.forEach(file => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${file.name}</td>
+        <td>${file.latest_version?.version_number || '-'}</td>
+        <td>${new Date(file.updated_at).toLocaleString()}</td>
+        <td>
+          <button class="btn btn-sm btn-info" onclick="loadVersionHistory(${file.id}, '${file.name}')">View Versions</button>
+          <button class="btn btn-sm btn-success" onclick="downloadVersion(${file.id}, ${file.latest_version?.version_number})">Download Latest</button>
+          <button class="btn btn-sm btn-secondary" onclick="previewFile(${file.id})">Preview</button>
+        </td>
+      `;
+      table.appendChild(row);
+    });
+    document.getElementById('fileTableWrapper').classList.remove('d-none');
+  }
+
+  async function downloadVersion(fileId, versionNumber) {
+    const res = await fetch(`/api/files/${fileId}/versions/${versionNumber}`, {
+      method: 'GET',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if (!res.ok) {
+      const error = await res.text();
+      alert(`❌ Download failed: ${error}`);
+      return;
+    }
+    const blob = await res.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `file_${fileId}_v${versionNumber}`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.URL.revokeObjectURL(url);
+  }
+
+  async function loadVersionHistory(fileId, fileName) {
+    const res = await fetch(`${API}/files/${fileId}/versions`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    currentVersions = data.versions;
+    currentFileId = fileId;
+    document.getElementById('compareFileId').value = fileId;
+
+    const tbody = document.getElementById('versionHistoryBody');
+    tbody.innerHTML = '';
+    currentVersions.forEach(v => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${v.version_number}</td>
+        <td>${v.uploader?.name || 'Unknown'}</td>
+        <td>${new Date(v.created_at).toLocaleString()}</td>
+        <td><button class="btn btn-sm btn-outline-primary" onclick="downloadVersion(${fileId}, ${v.version_number})">Download</button>  <button class="btn btn-sm btn-outline-secondary" onclick="previewVersion(${fileId}, ${v.version_number})">Preview</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+
+    document.getElementById('historyFileName').textContent = fileName;
+    document.getElementById('versionHistoryWrapper').classList.remove('d-none');
+  }
+
+  function showCompareModal() {
+    const selectA = document.getElementById('versionA');
+    const selectB = document.getElementById('versionB');
+    selectA.innerHTML = '';
+    selectB.innerHTML = '';
+
+    currentVersions.forEach(v => {
+      const optA = document.createElement('option');
+      optA.value = v.version_number;
+      optA.textContent = v.version_number;
+      selectA.appendChild(optA);
+
+      const optB = document.createElement('option');
+      optB.value = v.version_number;
+      optB.textContent = v.version_number;
+      selectB.appendChild(optB);
+    });
+
+    document.getElementById('compareModal').classList.remove('d-none');
+  }
+
+  async function compareVersions() {
+    const fileId = currentFileId;
+    const versionA = document.getElementById('versionA').value;
+    const versionB = document.getElementById('versionB').value;
+
+    const res = await fetch(`${API}/files/${fileId}/compare/${versionA}/${versionB}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/json'
+      }
+    });
+    const data = await res.json();
+
+    const diff = Diff.createTwoFilesPatch(
+      `v${versionA}`,
+      `v${versionB}`,
+      data.version_a,
+      data.version_b
+    );
+    const html = Diff2Html.html(diff, {
+      drawFileList: false,
+      matching: 'lines',
+      outputFormat: 'side-by-side'
+    });
+    document.getElementById('diffContainer').innerHTML = html;
+  }
+
+  document.getElementById('repoSelect').addEventListener('change', function () {
+    const repoId = this.value;
+    if (repoId) loadFiles(repoId);
+  });
+
+  async function previewFile(fileId) {
+  const res = await fetch(`/api/files/${fileId}/preview`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    alert('❌ Preview failed.');
+    return;
+  }
+
+  const data = await res.json();
+  const { content, extension, filename } = data;
+
+  let rendered = content;
+
+  if (extension === 'json') {
+    try {
+      rendered = JSON.stringify(JSON.parse(content), null, 2);
+    } catch (e) {
+      rendered = content;
+    }
+  }
+
+  if (extension === 'md') {
+    // Optional: use a markdown parser like marked.js
+    rendered = marked.parse(content);
+    document.getElementById('previewContent').innerHTML = rendered;
+  } else {
+    document.getElementById('previewContent').textContent = rendered;
+  }
+
+  document.getElementById('previewTitle').innerText = filename;
+  new bootstrap.Modal(document.getElementById('previewModal')).show();
+}
+async function previewVersion(fileId, versionNumber) {
+  const res = await fetch(`/api/files/${fileId}/versions/${versionNumber}/preview`, {
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+
+  if (!res.ok) {
+    alert('❌ Preview failed.');
+    return;
+  }
+
+  const data = await res.json();
+  const { content, extension, filename, version } = data;
+
+  let rendered = content;
+
+  if (extension === 'json') {
+    try {
+      rendered = JSON.stringify(JSON.parse(content), null, 2);
+    } catch (e) {
+      rendered = content;
+    }
+  }
+
+  if (extension === 'md') {
+    rendered = marked.parse(content);
+    document.getElementById('previewContent').innerHTML = rendered;
+  } else {
+    document.getElementById('previewContent').textContent = rendered;
+  }
+
+  document.getElementById('previewTitle').innerText = `${filename} (v${version})`;
+  new bootstrap.Modal(document.getElementById('previewModal')).show();
+}
+
+function searchFiles() {
+    const query = document.getElementById('searchInput').value.trim();
+    if (!query) return;
+
+    fetch(`/api/search-files?query=${encodeURIComponent(query)}`, {
+        headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        const container = document.getElementById('fileResults');
+        container.innerHTML = '';
+        if (data.files.length === 0) {
+            container.innerHTML = '<p>No matching files found.</p>';
+            return;
+        }
+
+        data.files.forEach(file => {
+            const div = document.createElement('div');
+            div.className = 'col-md-4 mb-3';
+            div.innerHTML = `
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">${file.name}</h5>
+                        <p class="card-text">Repository: ${file.repository_id}</p>
+                        <button class="btn btn-sm btn-info" onclick="loadVersionHistory(${file.id}, '${file.name}')">View Versions</button>
+                        <button class="btn btn-sm btn-success" onclick="downloadVersion(${file.id}, ${file.latest_version?.version_number})">Download Latest</button>
+                        <button class="btn btn-sm btn-secondary" onclick="previewFile(${file.id})">Preview</button>
+                    </div>
+                </div>`;
+            container.appendChild(div);
+        });
+    })
+    .catch(err => {
+        console.error('Search failed', err);
+    });
+}
+  loadRepositories();
+</script>
+<script src="js/auth.js"></script>
+</body>
+</html>

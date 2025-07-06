@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload File to Repository</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">📁 Alobha File Management</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/profile.html">👤 Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/repositories.html">📂 Repositories</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/upload.html">⬆️ Upload</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/listing.html">📋 Listing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/assign-role.html">👥 Assign Role</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <button class="btn btn-sm btn-outline-light" onclick="logout()">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-5">
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h4 class="mb-0">Upload File to Repository</h4>
+    </div>
+    <div class="card-body">
+      <form id="uploadForm" enctype="multipart/form-data">
+        <div class="mb-3">
+          <label for="repositoryId" class="form-label">Select Repository</label>
+          <select id="repositoryId" class="form-select" required></select>
+        </div>
+
+        <div class="mb-3">
+          <label for="fileName" class="form-label">File Name (optional)</label>
+          <input type="text" name="file_name" id="fileName" class="form-control" placeholder="Leave blank to use original filename">
+        </div>
+
+
+        <div class="mb-3">
+          <label for="file" class="form-label">Select File</label>
+          <input type="file" id="file" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100">Upload File</button>
+      </form>
+
+      <div id="uploadStatus" class="mt-3 alert d-none"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_BASE = '/api'; // Update if needed
+  const token = localStorage.getItem('token'); // JWT token
+  const repositorySelect = document.getElementById('repositoryId');
+  const uploadStatus = document.getElementById('uploadStatus');
+
+  // 🧠 Load user's repositories
+  async function loadRepositories() {
+    if (!token) {
+      alert('You are not logged in');
+      window.location.href = 'login.html';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/repositories`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+
+      if (!res.ok) throw new Error('Failed to fetch repositories');
+
+      const repositories = await res.json();
+      repositories.forEach(repo => {
+        const option = document.createElement('option');
+        option.value = repo.id;
+        option.textContent = repo.name;
+        repositorySelect.appendChild(option);
+      });
+
+    } catch (error) {
+      uploadStatus.className = 'alert alert-danger mt-3';
+      uploadStatus.innerText = `⚠️ ${error.message}`;
+      uploadStatus.classList.remove('d-none');
+    }
+  }
+
+  // 🚀 Handle upload
+  document.getElementById('uploadForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const file = document.getElementById('file').files[0];
+    const fileName = document.getElementById('fileName').value.trim();
+    const repoId = repositorySelect.value;
+
+    if (!file || !repoId) {
+      uploadStatus.className = 'alert alert-warning mt-3';
+      uploadStatus.innerText = '⚠️ Please select a file and repository.';
+      uploadStatus.classList.remove('d-none');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+    if (fileName) formData.append('file_name', fileName);
+
+    try {
+      const res = await fetch(`${API_BASE}/repositories/${repoId}/files`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      const data = await res.json();
+      if (res.status === 409) {
+        alert("⚠️ Another user is uploading at the same time. Please try again.");
+      }
+
+
+      uploadStatus.className = res.ok ? 'alert alert-success mt-3' : 'alert alert-danger mt-3';
+      uploadStatus.innerText = res.ok
+        ? `✅ File uploaded successfully. Version: ${data.version?.version_number ?? '-'}`
+        : `❌ ${data.message || data.error || 'Upload failed.'}`;
+      uploadStatus.classList.remove('d-none');
+
+    } catch (err) {
+      uploadStatus.className = 'alert alert-danger mt-3';
+      uploadStatus.innerText = `❌ Upload failed: ${err.message}`;
+      uploadStatus.classList.remove('d-none');
+    }
+  });
+
+  loadRepositories();
+</script>
+<script src="js/auth.js"></script>
+</body>
+</html>

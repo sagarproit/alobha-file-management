@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My Repositories</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#">📁 Alobha File Management</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="/profile.html">👤 Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/repositories.html">📂 Repositories</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/upload.html">⬆️ Upload</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/listing.html">📋 Listing</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/assign-role.html">👥 Assign Role</a>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <button class="btn btn-sm btn-outline-light" onclick="logout()">Logout</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  <div class="container py-5">
+    <h2 class="mb-4">Repositories</h2>
+
+    <form id="repoForm" class="mb-4">
+      <div class="input-group">
+        <input type="text" id="repoName" class="form-control" placeholder="Repository Name" required>
+        <button class="btn btn-primary" type="submit">Create</button>
+      </div>
+    </form>
+
+    <ul class="list-group" id="repoList"></ul>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    const api = '/api/repositories';
+
+    if (!token) {
+      alert('Not logged in');
+      window.location.href = 'login.html';
+    }
+
+    async function loadRepos() {
+      const res = await fetch(api, {
+        headers: { 'Authorization': 'Bearer ' + token }
+      });
+      const repos = await res.json();
+      const list = document.getElementById('repoList');
+      list.innerHTML = '';
+      repos.forEach(repo => {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.innerHTML = `
+          <span><strong>${repo.name}</strong></span>
+          <span>
+            <button class="btn btn-sm btn-warning me-2" onclick="renameRepo(${repo.id}, '${repo.name}')">Rename</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteRepo(${repo.id})">Delete</button>
+          </span>
+        `;
+        list.appendChild(li);
+      });
+    }
+
+    async function createRepo(name) {
+      const res = await fetch(api, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + token
+        },
+        body: JSON.stringify({ name })
+      });
+      await loadRepos();
+    }
+
+    async function renameRepo(id, oldName) {
+      const newName = prompt('Rename repository:', oldName);
+      if (newName && newName !== oldName) {
+        await fetch(api + '/' + id, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + token
+          },
+          body: JSON.stringify({ name: newName })
+        });
+        await loadRepos();
+      }
+    }
+
+    async function deleteRepo(id) {
+      if (confirm('Are you sure you want to delete this repository?')) {
+        await fetch(api + '/' + id, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': 'Bearer ' + token
+          }
+        });
+        await loadRepos();
+      }
+    }
+
+    document.getElementById('repoForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('repoName').value;
+      await createRepo(name);
+      document.getElementById('repoName').value = '';
+    });
+
+    loadRepos();
+  </script>
+  <script src="js/auth.js"></script>
+</body>
+</html>

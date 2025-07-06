@@ -1,0 +1,371 @@
+{
+	"info": {
+		"_postman_id": "7910cd93-7bb8-4ae8-b429-7fb465f762e0",
+		"name": "Alobha File Management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "14023463"
+	},
+	"item": [
+		{
+			"name": "http://127.0.0.1:8000/api/register",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"John Doe\",\r\n  \"email\": \"john@example.com\",\r\n  \"password\": \"password\",\r\n  \"password_confirmation\": \"password\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:8000/api/register"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/login",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"email\": \"john@example.com\",\r\n  \"password\": \"password\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:8000/api/login"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/profile",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": "http://127.0.0.1:8000/api/profile"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/repositories",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Project Alpha\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:8000/api/repositories"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/repositories",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"url": "http://127.0.0.1:8000/api/repositories"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/repositories/7",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Updated Repository Name\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:8000/api/repositories/7"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/repositories/7",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"name\": \"Updated Repository Name\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:8000/api/repositories/7"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/repositories/8/files",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": "/C:/Users/Empires/Documents/hms.txt"
+						},
+						{
+							"key": "name",
+							"value": "my-notes",
+							"type": "text"
+						}
+					]
+				},
+				"url": "http://127.0.0.1:8000/api/repositories/8/files"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/repositories/8/files",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"url": "http://127.0.0.1:8000/api/repositories/8/files"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/files/9/versions",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"url": "http://127.0.0.1:8000/api/files/9/versions"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/files/9/versions/1",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"url": "http://127.0.0.1:8000/api/files/9/versions/1"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/files/9/compare/1/2",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"url": "http://127.0.0.1:8000/api/files/9/compare/1/2"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/files/9/preview",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"url": "http://127.0.0.1:8000/api/files/9/preview"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/files/9/versions/2/preview",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"url": "http://127.0.0.1:8000/api/files/9/versions/2/preview"
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/search-files/?query=login",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://127.0.0.1:8000/api/search-files/?query=login",
+					"protocol": "http",
+					"host": [
+						"127",
+						"0",
+						"0",
+						"1"
+					],
+					"port": "8000",
+					"path": [
+						"api",
+						"search-files",
+						""
+					],
+					"query": [
+						{
+							"key": "query",
+							"value": "login"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://127.0.0.1:8000/api/repositories/8/assign-role",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Authorization",
+						"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjQsIm5hbWUiOiJKb2huIERvZSIsImVtYWlsIjoiam9obkBleGFtcGxlLmNvbSIsImlhdCI6MTc1MTc4OTM5MCwiZXhwIjoxNzUxNzkyOTkwfQ.kJFoukG1b7thWGHFbnBRGBI32nsTy_HVcNQWx1Aza7Q",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"user_id\": 2,\r\n  \"role\": \"write\"\r\n}\r\n",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": "http://127.0.0.1:8000/api/repositories/8/assign-role"
+			},
+			"response": []
+		}
+	]
+}
